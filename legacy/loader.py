@@ -148,6 +148,8 @@ def patched_import(name: str, *args, **kwargs):
         if name == "hikkals":
             return native_import("legacy" + name[5:], *args, **kwargs)
     if name.startswith("telethon"):
+        if name == "telethon.types":
+            return native_import("legacytl.tl.types", *args, **kwargs)
         return native_import("legacytl" + name[8:], *args, **kwargs)
 
     return native_import(name, *args, **kwargs)
@@ -157,6 +159,23 @@ builtins.__import__ = patched_import
 
 # Heroku module compatibility: set up sys.modules aliases
 _herokutl_aliases = {
+    "telethon": "legacytl",
+    "telethon.types": "legacytl.tl.types",
+    "telethon.errors": "legacytl.errors",
+    "telethon.tl": "legacytl.tl",
+    "telethon.extensions": "legacytl.extensions",
+    "telethon.hints": "legacytl.hints",
+    "telethon.utils": "legacytl.utils",
+    "telethon.sessions": "legacytl.sessions",
+    "telethon.password": "legacytl.password",
+    "telethon.events": "legacytl.events",
+    "telethon.functions": "legacytl.functions",
+    "telethon.client": "legacytl.client",
+    "telethon.network": "legacytl.network",
+    "telethon.connection": "legacytl.connection",
+    "telethon.custom": "legacytl.custom",
+    "telethon.requestiter": "legacytl.requestiter",
+
     "herokutl": "legacytl",
     "herokutl.types": "legacytl.tl.types",
     "herokutl.errors": "legacytl.errors",
