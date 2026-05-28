@@ -874,3 +874,30 @@ class LegacySettingsMod(loader.Module):
             message,
             self.strings("invoke").format(method, utils.escape_html(result)),
         )
+
+
+    @loader.command()
+    async def logchat(self, message):
+        """<chat_id> | Set log chat ID for startup messages"""
+        args = utils.get_args_raw(message)
+        if not args:
+            await utils.answer(
+                message,
+                self.strings("logchat_current").format(
+                    self._db.get("legacy", "logchat", "Not set")
+                ),
+            )
+            return
+        
+        try:
+            chat_id = int(args)
+            self._db.set("legacy", "logchat", chat_id)
+            await utils.answer(
+                message,
+                self.strings("logchat_set").format(chat_id=chat_id),
+            )
+        except ValueError:
+            await utils.answer(
+                message,
+                self.strings("logchat_invalid").format(args=args),
+            )

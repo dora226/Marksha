@@ -819,7 +819,7 @@ class Legacy:
                 self.omit_log = True
 
             await client.legacy_inline.bot.send_animation(
-                logging.getLogger().handlers[0].get_logid_by_client(client.tg_id),
+                logging.getLogger().handlers[0].get_logid_by_client(client.tg_id) or self._db.get("legacy", "logchat", 0),
                 "https://i.postimg.cc/13x4nnxm/41-9-D6-DF8-E.gif",
                 caption=(
                     "🌙 <b>Legacy started!</b>\n"
