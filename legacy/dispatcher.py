@@ -331,7 +331,7 @@ class CommandDispatcher:
             return False
 
         # Heroku compatibility: check from_id on commands
-        if getattr(func, "from_id", None) and message.sender_id != func.from_id:
+        if getattr(func, "from_id", None) and getattr(message, "sender_id", None) != func.from_id:
             return False
 
         message.message = prefix + txt + message.message[len(prefix + command) :]

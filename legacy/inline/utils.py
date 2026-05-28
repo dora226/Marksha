@@ -488,7 +488,9 @@ class Utils(InlineUnit):
                 await asyncio.sleep(e.retry_after)
                 return await self._edit_unit(**utils.get_kwargs())
             except BadRequest as e:
-                if "there is no text in the message to edit" not in str(e):
+                if "there is no text in the message to edit" not in str(e) \
+                   and "chat not found" not in str(e) \
+                   and "message to edit not found" not in str(e):
                     raise
 
                 try:
