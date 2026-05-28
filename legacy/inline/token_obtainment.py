@@ -31,7 +31,7 @@ class TokenObtainment(InlineUnit):
             logger.debug(">> %s", m.raw_text)
             logger.debug("<< %s", r.raw_text)
 
-            if "20" in r.raw_text:
+            if "20" in r.raw_text and ("bots" in r.raw_text.lower() or "limit" in r.raw_text.lower()):
                 return False
 
             await fw_protect()
@@ -238,7 +238,11 @@ class TokenObtainment(InlineUnit):
                         logger.debug(">> %s", m.raw_text)
                         logger.debug("<< %s", r.raw_text)
 
-                    token = r.raw_text.splitlines()[1]
+                    token_lines = r.raw_text.splitlines()
+                    if len(token_lines) < 2:
+                        logger.error("Failed to parse token from BotFather response")
+                        return False
+                    token = token_lines[1]
 
                     self._db.set("legacy.inline", "bot_token", token)
                     self._token = token

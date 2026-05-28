@@ -943,16 +943,19 @@ class Legacy:
     def _shutdown_handler(self, signum, frame):
         """Shutdown handler"""
         logging.info("Bye")
-        for client in self.clients:
-            client.disconnect()
+        if hasattr(self, "clients"):
+            for client in self.clients:
+                with contextlib.suppress(Exception):
+                    client.disconnect()
 
         sys.exit(0)
 
     def main(self):
         """Main entrypoint"""
         signal.signal(signal.SIGINT, self._shutdown_handler)
-        self.loop.run_until_complete(self._main())
-        self.loop.close()
+        if hasattr(self, "loop") and self.loop:
+            self.loop.run_until_complete(self._main())
+            self.loop.close()
 
 
 ltl_ext_html.CUSTOM_EMOJIS = not get_config_key("disable_custom_emojis")
