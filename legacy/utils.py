@@ -1832,9 +1832,20 @@ def get_git_info() -> typing.Tuple[str, str]:
     :return: Git info
     """
     hash_ = get_git_hash()
+    repo_url = "https://github.com/dora226/Marksha"
+    try:
+        import git as _git
+        r = _git.Repo()
+        if r.remotes:
+            url = list(r.remote().urls)[0]
+            if url.endswith(".git"):
+                url = url[:-4]
+            repo_url = url.rstrip("/")
+    except Exception:
+        pass
     return (
         hash_,
-        f"https://github.com/Crayz310/Legacy/commit/{hash_}" if hash_ else "",
+        f"{repo_url}/commit/{hash_}" if hash_ else "",
     )
 
 
