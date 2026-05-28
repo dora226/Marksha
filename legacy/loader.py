@@ -1045,7 +1045,17 @@ class Modules:
 
     async def send_ready(self):
         """Send all data to all modules"""
-        await self.inline.register_manager()
+        try:
+            await asyncio.wait_for(
+                self.inline.register_manager(),
+                timeout=120,
+            )
+        except asyncio.TimeoutError:
+            logger.warning("Inline register_manager timed out after 120s, continuing without inline")
+            self.inline.init_complete = False
+        except Exception as e:
+            logger.exception("Inline register_manager failed: %s", e)
+
         await asyncio.gather(
             *[self.send_ready_one_wrapper(mod) for mod in self.modules]
         )
