@@ -1027,9 +1027,21 @@ class Modules:
     async def send_ready_one_wrapper(self, *args, **kwargs):
         """Wrapper for send_ready_one"""
         try:
-            await self.send_ready_one(*args, **kwargs)
+            await asyncio.wait_for(
+                self.send_ready_one(*args, **kwargs),
+                timeout=60,
+            )
+        except asyncio.TimeoutError:
+            mod = args[0] if args else kwargs.get("mod", "unknown")
+            logger.warning(
+                "Module %s client_ready timed out after 60s, skipped",
+                mod,
+            )
         except Exception as e:
-            logger.exception("Failed to send mod init complete signal due to %s", e)
+            logger.exception(
+                "Failed to send mod init complete signal due to %s",
+                f"{type(e).__name__}: {e}" if str(e) else f"{type(e).__name__}",
+            )
 
     async def send_ready(self):
         """Send all data to all modules"""
@@ -1077,7 +1089,7 @@ class Modules:
                     " attempting unload"
                 ),
                 mod,
-                e,
+                f"{type(e).__name__}: {e}" if str(e) else f"{type(e).__name__}",
             )
             self.modules.remove(mod)
             raise
