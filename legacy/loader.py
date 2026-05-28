@@ -140,6 +140,9 @@ def patched_import(name: str, *args, **kwargs):
     if name.startswith("hikkatl"):
         return native_import("legacytl" + name[7:], *args, **kwargs)
     if name.startswith("herokutl"):
+        # herokutl.types -> legacytl.tl.types (special case)
+        if name == "herokutl.types":
+            return native_import("legacytl.tl.types", *args, **kwargs)
         return native_import("legacytl" + name[8:], *args, **kwargs)
     if name.startswith("hikka"):
         if name == "hikkals":
@@ -151,6 +154,36 @@ def patched_import(name: str, *args, **kwargs):
 
 
 builtins.__import__ = patched_import
+
+# Heroku module compatibility: set up sys.modules aliases
+_herokutl_aliases = {
+    "herokutl": "legacytl",
+    "herokutl.types": "legacytl.tl.types",
+    "herokutl.errors": "legacytl.errors",
+    "herokutl.tl": "legacytl.tl",
+    "herokutl.extensions": "legacytl.extensions",
+    "herokutl.hints": "legacytl.hints",
+    "herokutl.utils": "legacytl.utils",
+    "herokutl.sessions": "legacytl.sessions",
+    "herokutl.password": "legacytl.password",
+    "herokutl.events": "legacytl.events",
+    "herokutl.functions": "legacytl.functions",
+    "herokutl.client": "legacytl.client",
+    "herokutl.network": "legacytl.network",
+    "herokutl.connection": "legacytl.connection",
+    "herokutl.custom": "legacytl.custom",
+    "herokutl.requestiter": "legacytl.requestiter",
+}
+try:
+    import legacytl as _herokutl_legacytl
+    for _alias, _target in _herokutl_aliases.items():
+        if _alias not in sys.modules:
+            try:
+                sys.modules[_alias] = __import__(_target, fromlist=["__trash__"])
+            except ImportError:
+                pass
+except ImportError:
+    pass
 
 
 class InfiniteLoop:
