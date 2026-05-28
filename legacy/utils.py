@@ -424,7 +424,7 @@ async def answer_file(
         >>> await utils.answer_file(message, "test.txt")
         >>> await utils.answer_file(
             message,
-            "https://mods.hikariatama.ru/badges/artai.jpg",
+            "https://raw.githubusercontent.com/dora226/Marksha/refs/heads/dev/assets/legacy-assets.png",
             "This is the cool module, check it out!",
         )
     """
