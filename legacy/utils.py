@@ -1787,13 +1787,13 @@ def get_ram_usage() -> float:
 
 
 async def get_cpu_usage_async() -> float:
-    from aiopsutil import AsyncPSUtil
-
-    aiops = AsyncPSUtil()
-
-    cpu_usage = await aiops.cpu_percent(interval=0.5)
-
-    return cpu_usage
+    try:
+        from aiopsutil import AsyncPSUtil
+        aiops = AsyncPSUtil()
+        cpu_usage = await aiops.cpu_percent(interval=0.5)
+        return cpu_usage
+    except ImportError:
+        return 0.0
 
 
 def get_cpu_usage() -> float:

@@ -106,7 +106,7 @@ class UpdaterMod(loader.Module):
                 if self._client.legacy_me.premium
                 and CUSTOM_EMOJIS
                 and isinstance(msg_obj, Message)
-                else "Legacy"
+                else "マークシャ"
             ),
         )
 

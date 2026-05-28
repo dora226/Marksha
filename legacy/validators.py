@@ -9,15 +9,14 @@ import re
 import typing
 
 import grapheme
-from emoji import get_emoji_unicode_dict
+from emoji import EMOJI_DATA
 
 from legacy.types import ListLike
 
 from . import utils
 from .translations import SUPPORTED_LANGUAGES, translator
 
-emoji_dict = get_emoji_unicode_dict("en")
-ALLOWED_EMOJIS = set(emoji_dict.values()) if emoji_dict else []
+ALLOWED_EMOJIS = set(EMOJI_DATA.keys()) if EMOJI_DATA else []
 
 
 class ValidationError(Exception):
