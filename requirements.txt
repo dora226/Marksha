@@ -18,3 +18,4 @@ uvloop==0.21.0
 ujson==5.11.0
 
 # Python 3.8+
+aiopsutil==0.1.0

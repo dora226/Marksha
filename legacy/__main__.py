@@ -41,7 +41,7 @@ def start():
         and all(trigger not in os.environ for trigger in {"DOCKER", "GOORM", "NO_SUDO"})
     ):
         print("🚫" * 15)
-        print("You attempted to run Legacy on behalf of root user")
+        print("You attempted to run マークシャ on behalf of root user")
         print("Please, create a new user and restart script")
         print("If this action was intentional, pass --root argument instead")
         print("🚫" * 15)
@@ -56,8 +56,8 @@ def start():
             print("Added NO_SUDO in your environment variables")
             restart()
 
-    if sys.version_info < (3, 8, 0):
-        print("🚫 Error: you must use at least Python version 3.8.0")
+    if sys.version_info < (3, 10, 0):
+        print("🚫 Error: you must use at least Python version 3.10.0")
         sys.exit(1)
 
     if __package__ != "legacy":
