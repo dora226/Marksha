@@ -120,6 +120,24 @@ class TokenObtainment(InlineUnit):
                                 )
                                 self._token = passed_token
                                 self._db.set("legacy.inline", "bot_token", self._token)
+                                # Also configure inline mode via BotFather
+                                bot_username = data.get("result", {}).get("username")
+                                if bot_username and not await self._check_inline_configured(bot_username):
+                                    logger.info(
+                                        "Attempting to configure inline mode via BotFather for @%s",
+                                        bot_username,
+                                    )
+                                    try:
+                                        await self._configure_botfather_inline(bot_username)
+                                    except Exception as e:
+                                        logger.warning(
+                                            "Could not configure inline mode via BotFather: %s",
+                                            e,
+                                        )
+                                        logger.info(
+                                            "Inline will be used with Bot API default settings"
+                                        )
+
 
                                 return True
 
@@ -182,7 +200,7 @@ class TokenObtainment(InlineUnit):
                         "custom_bot",
                         False,
                     ) and not re.search(
-                        r"@{utils.get_version_raw()}_[0-9a-zA-Z]{6}_bot", button.text
+                        f"@{utils.get_version_raw()}_[0-9a-zA-Z]{6}_bot", button.text
                     ):
                         continue
 
@@ -284,6 +302,80 @@ class TokenObtainment(InlineUnit):
             self.init_complete = False
         else:
             await self.register_manager(ignore_token_checks=True)
+
+
+
+    async def _check_inline_configured(self, bot_username: str) -> bool:
+        """Check if inline mode is already configured for this bot"""
+        if not self._db.get("legacy.inline", "inline_configured", False):
+            return False
+        stored_username = self._db.get("legacy.inline", "inline_configured_for", "")
+        return stored_username == bot_username
+
+    async def _configure_botfather_inline(self, bot_username: str):
+        """
+        Configure inline mode via BotFather for the given bot
+        Sets up /setinline and /setinlinefeedback
+        """
+        if not self._db.get(__name__, "no_mute", False):
+            await utils.dnd(
+                self._client,
+                await self._client.get_entity("@BotFather"),
+                True,
+            )
+            self._db.set(__name__, "no_mute", True)
+
+        async with self._client.conversation("@BotFather", exclusive=False) as conv:
+            try:
+                await fw_protect()
+                m = await conv.send_message("/cancel")
+                r = await conv.get_response()
+                await m.delete()
+                await r.delete()
+            except Exception:
+                pass
+
+            for cmd in [
+                "/setinline",
+                f"@{bot_username}",
+                "user@legacy:~$",
+                "/setinlinefeedback",
+                f"@{bot_username}",
+                "Enabled",
+                "/setuserpic",
+                f"@{bot_username}",
+            ]:
+                await fw_protect()
+                m = await conv.send_message(cmd)
+                r = await conv.get_response()
+                await fw_protect()
+                await m.delete()
+                await r.delete()
+
+            try:
+                await fw_protect()
+                from .. import main
+
+                if hasattr(main, "AVATAR_PATH") and main.AVATAR_PATH:
+                    m = await conv.send_file(main.AVATAR_PATH)
+                    r = await conv.get_response()
+                    await fw_protect()
+                    await m.delete()
+                    await r.delete()
+            except Exception:
+                await fw_protect()
+                m = await conv.send_message("/cancel")
+                r = await conv.get_response()
+                await fw_protect()
+                await m.delete()
+                await r.delete()
+
+        self._db.set("legacy.inline", "inline_configured", True)
+        self._db.set("legacy.inline", "inline_configured_for", bot_username)
+        logger.info(
+            "Inline mode successfully configured via BotFather for @%s",
+            bot_username,
+        )
 
     async def _dp_revoke_token(self, already_initialised: bool = True):
         if already_initialised:

@@ -38,6 +38,7 @@ ALL_INVOKES = [
 @loader.tds
 class LegacySettingsMod(loader.Module):
     strings = {"name": "LegacySettings"}
+    strings_ru = {"name": "LegacySettings", "logchat_current": "🗂 <b>Текущий лог-чат:</b> <code>{}</code>", "logchat_set": "✅ <b>Лог-чат установлен на</b> <code>{chat_id}</code>", "logchat_invalid": "❌ <b>Неверный ID чата:</b> <code>{args}</code>"}
 
     def get_watchers(self) -> tuple:
         return [
