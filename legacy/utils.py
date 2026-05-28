@@ -1519,8 +1519,15 @@ def get_commit_url() -> str:
     :return: Git commit url
     """
     try:
+        import git as _git
+        repo = _git.Repo()
+        origin_url = list(repo.remote().urls)[0] if repo.remotes else "https://github.com/dora226/Marksha"
+        if origin_url.endswith(".git"):
+            origin_url = origin_url[:-4]
+        if origin_url.startswith("https://"):
+            origin_url = origin_url.rstrip("/")
         hash_ = get_git_hash()
-        return f'<a href="https://github.com/Crayz310/Legacy/commit/{hash_}">#{hash_[:7]}</a>'
+        return f'<a href="{origin_url}/commit/{hash_}">#{hash_[:7]}</a>'
     except Exception:
         return "Unknown"
 
