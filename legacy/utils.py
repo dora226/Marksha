@@ -1792,7 +1792,7 @@ async def get_cpu_usage_async() -> float:
         aiops = AsyncPSUtil()
         cpu_usage = await aiops.cpu_percent(interval=0.5)
         return cpu_usage
-    except ImportError:
+    except Exception:
         return 0.0
 
 
